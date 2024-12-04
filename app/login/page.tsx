@@ -18,7 +18,6 @@ export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
-        console.log(formData);
         e.preventDefault();
         setIsLoading(true);
 
