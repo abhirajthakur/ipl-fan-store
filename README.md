@@ -1,36 +1,172 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
+  <h1>🏏 IPL Fan Store</h1>
+  <p>A personalized e-commerce platform for IPL team merchandise</p>
 
-## Getting Started
+![Next.js](https://img.shields.io/badge/Next.js-13.5-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.2-blue?style=for-the-badge&logo=typescript)
+![Prisma](https://img.shields.io/badge/Prisma-5.10-2D3748?style=for-the-badge&logo=prisma)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.3-38B2AC?style=for-the-badge&logo=tailwind-css)
 
-First, run the development server:
+</div>
+
+## ✨ Features
+
+- 🎯 **Team Assignment**: Users are automatically assigned to an IPL team upon registration
+- 🎨 **Dynamic Theming**: UI adapts to team colors and branding
+- 🛍️ **Personalized Shopping**: Team-specific merchandise and recommendations
+- 🔐 **Secure Authentication**: JWT-based auth with NextAuth.js
+- 🛒 **Shopping Cart**: Real-time cart management with optimistic updates
+- 📱 **Responsive Design**: Seamless experience across all devices
+
+## 🚀 Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/yourusername/ipl-fan-store.git
+
+# Install dependencies
+npm install
+
+# Set up the database
+npx prisma migrate dev
+npx prisma db seed
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: Next.js 13.5 with App Router
+- **Language**: TypeScript
+- **Database**: SQLite with Prisma ORM
+- **Authentication**: NextAuth.js
+- **Styling**: Tailwind CSS + shadcn/ui
+- **State Management**: Zustand
+- **Icons**: Lucide React
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📚 API Documentation
 
-## Learn More
+### Authentication
 
-To learn more about Next.js, take a look at the following resources:
+#### Register User
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```http
+POST /api/auth/register
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "securepassword"
+}
+```
 
-## Deploy on Vercel
+**Response**: User object with assigned team
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### Login
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```http
+POST /api/auth/login
+```
+
+```json
+{
+  "email": "john@example.com",
+  "password": "securepassword"
+}
+```
+
+**Response**: Session token and user details
+
+### Products
+
+#### Get All Products
+
+```http
+GET /api/products
+```
+
+**Response**: List of available products
+
+### Cart Management
+
+#### Get Cart
+
+```http
+GET /api/cart
+```
+
+**Response**: Current user's cart with items
+
+#### Add to Cart
+
+```http
+POST /api/cart
+```
+
+```json
+{
+  "productId": "product_id",
+  "quantity": 1
+}
+```
+
+**Response**: Updated cart
+
+#### Update Cart Item
+
+```http
+PATCH /api/cart/items/:itemId
+```
+
+```json
+{
+  "quantity": 2
+}
+```
+
+**Response**: Updated cart
+
+#### Remove from Cart
+
+```http
+DELETE /api/cart/items/:itemId
+```
+
+**Response**: Updated cart
+
+## 🏗️ Project Structure
+
+```
+ipl-fan-store/
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   ├── actions/           # Server actions
+│   └── (routes)/         # Page routes
+├── components/            # React components
+│   ├── ui/               # UI components
+│   └── cart/             # Cart components
+├── lib/                   # Utilities and helpers
+│   ├── services/         # API services
+│   ├── stores/           # State management
+│   └── utils/            # Helper functions
+└── prisma/               # Database schema and migrations
+```
+
+## 🎨 Team Themes
+
+Each IPL team has its unique theme:
+
+- 🔴 **Royal Challengers Bangalore**: Red & Gold
+- 💙 **Mumbai Indians**: Blue & Gold
+- 💛 **Chennai Super Kings**: Yellow & Blue
+- 🟣 **Kolkata Knight Riders**: Purple & Gold
+- 🔵 **Delhi Capitals**: Blue & Red
+- 💖 **Rajasthan Royals**: Pink & Blue
+- 🟠 **Sunrisers Hyderabad**: Orange & Black
+- ❤️ **Punjab Kings**: Red & Silver
+- ⚫ **Gujarat Titans**: Navy & Gold
+- 🎀 **Lucknow Super Giants**: Burgundy & Turquoise
+
