@@ -66,7 +66,7 @@ export default function TeamHeader({user}: TeamHeaderProps) {
                         <Button
                             variant="outline"
                             className="bg-white text-gray-900 hover:bg-gray-100"
-                            onClick={() => signOut()}
+                            onClick={() => signOut({callbackUrl: "/"})}
                         >
                             <LogOut className="mr-2 h-4 w-4"/>
                             Logout
