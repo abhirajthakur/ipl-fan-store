@@ -40,7 +40,6 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { productId, quantity } = body;
 
-    // Validate input
     if (!productId || typeof quantity !== "number" || quantity < 1) {
       return NextResponse.json(
         { error: "Invalid product ID or quantity" },
@@ -48,7 +47,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify product exists
     const product = await prisma.product.findUnique({
       where: { id: productId },
     });
@@ -81,7 +79,6 @@ export async function POST(request: Request) {
         },
       });
 
-      // Fetch updated cart with items and product details
       return await prisma.cart.findUnique({
         where: { id: cart.id },
         include: {
