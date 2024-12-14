@@ -1,45 +1,47 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/auth";
+import {
+  DEFAULT_LOGIN_REDIRECT,
+  apiAuthPrefix,
+  authRoutes,
+  publicRoutes,
+} from "@/routes";
 
-// List of public routes that don't require authentication
-const PUBLIC_FILE_ROUTES = [
-  "/favicon.ico",
-  "/manifest.json",
-  "/_next/static",
-  "/_next/image",
-];
+// @ts-ignore
+export default auth((req) => {
+  const isAuthenticated = !!req.auth;
+  const { nextUrl } = req;
 
-// List of public routes that are accessible without login
-const PUBLIC_ROUTES = ["/", "/login", "/register"];
+  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const token = await getToken({ req: request });
-
-  // Check if the route is a public file or static asset
-  if (PUBLIC_FILE_ROUTES.some((route) => pathname.startsWith(route))) {
-    return NextResponse.next();
+  if (isApiAuthRoute) {
+    return null;
   }
 
-  // Allow public routes without authentication
-  if (PUBLIC_ROUTES.includes(pathname)) {
-    return NextResponse.next();
+  if (isAuthRoute) {
+    if (isAuthenticated) {
+      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+    }
+    return null;
   }
 
-  // Redirect to login for authenticated routes if no token exists
-  if (!token) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+  if (!isAuthenticated && !isPublicRoute) {
+    let callbackUrl = nextUrl.pathname;
+    if (nextUrl.search) {
+      callbackUrl += nextUrl.search;
+    }
+
+    const encodedCallbakUrl = encodeURIComponent(callbackUrl);
+
+    return Response.redirect(
+      new URL(`/login?callbackUrl=${encodedCallbakUrl}`, nextUrl),
+    );
   }
 
-  return NextResponse.next();
-}
+  return null;
+});
 
-// Specify which routes this middleware should run on
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|images|favicon.ico).*)"],
 };
