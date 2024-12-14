@@ -1,47 +1,45 @@
-import { getToken } from "next-auth/jwt";
-import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export async function middleware(req: NextRequest) {
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
+// List of public routes that don't require authentication
+const PUBLIC_FILE_ROUTES = [
+  "/favicon.ico",
+  "/manifest.json",
+  "/_next/static",
+  "/_next/image",
+];
 
-  const isAuthenticated = !!token;
-  const isAuthPage =
-    req.nextUrl.pathname.startsWith("/login") ||
-    req.nextUrl.pathname.startsWith("/register");
+// List of public routes that are accessible without login
+const PUBLIC_ROUTES = ["/", "/login", "/register"];
 
-  // Protect all routes except public routes
-  const publicRoutes = ["/", "/login", "/register"];
-  const isPublicRoute = publicRoutes.some(
-    (route) =>
-      req.nextUrl.pathname === route ||
-      req.nextUrl.pathname.startsWith(`${route}/`),
-  );
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const token = await getToken({ req: request });
 
-  if (isAuthPage) {
-    if (isAuthenticated) {
-      return NextResponse.redirect(new URL("/dashboard", req.url));
-    }
+  // Check if the route is a public file or static asset
+  if (PUBLIC_FILE_ROUTES.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
-  if (!isAuthenticated && !isPublicRoute) {
-    const redirectUrl = new URL("/login", req.url);
+  // Allow public routes without authentication
+  if (PUBLIC_ROUTES.includes(pathname)) {
+    return NextResponse.next();
+  }
 
-    redirectUrl.searchParams.set(
-      "from",
-      encodeURIComponent(req.nextUrl.pathname + req.nextUrl.search),
-    );
-
-    return NextResponse.redirect(redirectUrl);
+  // Redirect to login for authenticated routes if no token exists
+  if (!token) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
 }
 
+// Specify which routes this middleware should run on
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|images|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 };
