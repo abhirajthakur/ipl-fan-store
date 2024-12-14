@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import prisma from "@/db";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { getTeamById } from "@/lib/utils";
+import { IPLTeam } from "./lib/types";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -55,7 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token && session.user) {
         session.user.id = token.sub as string;
         session.user.teamId = token.teamId as string;
-        session.user.team = token.team;
+        session.user.team = token.team as unknown as IPLTeam;
       }
       return session;
     },
